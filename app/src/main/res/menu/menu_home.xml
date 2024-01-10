@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/profileFragment"
+        android:icon="@drawable/baseline_home_24"
+        android:title="@string/home" />
+
+    <item
+        android:id="@+id/identifyFragment2"
+        android:icon="@drawable/baseline_linked_camera_24"
+        android:title="@string/identify" />
+
+    <item
+        android:id="@+id/discoverFragment"
+        android:icon="@drawable/baseline_explore_24"
+        android:title="@string/explore" />
+    <item
+        android:id="@+id/favouritesFragment2"
+        android:icon="@drawable/baseline_favorite_24_black"
+        android:title="@string/wish" />
+    <item
+        android:id="@+id/historyFragment2"
+        android:icon="@drawable/baseline_history_24"
+        android:title="@string/history" />
+
+</menu>

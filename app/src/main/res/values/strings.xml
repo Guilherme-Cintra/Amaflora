@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">AmaFloraFB</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title">AmaFlora</string>
+    <string name="introP">Identify your plants and never forget to water them again!</string>
+    <string name="googleText">Continue with google</string>
+    <string name="listPlants">plants</string>
+    <string name="identify">identify</string>
+    <string name="home">home</string>
+    <string name="greetings">Hello</string>
+    <string name="no_plants">You dont have any plants yet☹️</string>
+    <string name="explore">explore</string>
+    <string name="species_text">Species name</string>
+    <string name="search_hint">Search for a plant here</string>
+    <string name="water_avg">Average</string>
+    <string name="water_loads">Often</string>
+    <string name="water_else">not oftenr</string>
+    <string name="care_lvl_lbl">Care level</string>
+    <string name="desc_lbl">Description</string>
+    <string name="wish">favorits</string>
+    <string name="history">identification history</string>
+</resources>

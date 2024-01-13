@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import ca.qc.castroguilherme.amaflorafb.models.Data
+import ca.qc.castroguilherme.amaflorafb.models.plantdbmodel.Data
 import com.bumptech.glide.Glide
 
 class DiscoverAdapter() : RecyclerView.Adapter<DiscoverAdapter.PlantViewHolder>() {
@@ -70,13 +70,10 @@ class DiscoverAdapter() : RecyclerView.Adapter<DiscoverAdapter.PlantViewHolder>(
             "Average" -> {
                 return "Average"
             }
-
             "Frequent" -> {
                 return "Frequent"
             }
-
         }
-
         return "Rarely"
     }
 
@@ -91,7 +88,6 @@ class DiscoverAdapter() : RecyclerView.Adapter<DiscoverAdapter.PlantViewHolder>(
                     return "careful"
                 }
             }
-
             2 -> {
                 if (plants.contains("full sun") && plants.contains("part shade") || plants.contains("full sun") && plants.contains("part sun/part shade")) {
                     return  "2 to 6 hours"
@@ -106,6 +102,4 @@ class DiscoverAdapter() : RecyclerView.Adapter<DiscoverAdapter.PlantViewHolder>(
         }
         return  "no worries"
     }
-
-
 }

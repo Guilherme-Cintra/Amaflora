@@ -1,9 +1,9 @@
-package ca.qc.castroguilherme.amaflorafb.models
+package ca.qc.castroguilherme.amaflorafb.models.plantdbmodel
 
 
 import com.google.gson.annotations.SerializedName
 
-data class DefaultImageX(
+data class DefaultImage(
     @SerializedName("license")
     val license: Int,
     @SerializedName("license_name")

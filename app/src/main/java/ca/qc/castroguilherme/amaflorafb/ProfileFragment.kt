@@ -1,10 +1,12 @@
 package ca.qc.castroguilherme.amaflorafb
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.navigation.fragment.findNavController
 import ca.qc.castroguilherme.amaflorafb.databinding.FragmentProfileBinding
 import com.bumptech.glide.Glide
 import com.google.firebase.Firebase
@@ -54,6 +56,7 @@ class ProfileFragment : Fragment() {
 
 
         initiateUser()
+
         binding.hello.setText("${binding.hello.text} ${firebaseUser.displayName}")
 
         binding.imageView3.apply {
@@ -61,11 +64,21 @@ class ProfileFragment : Fragment() {
 
         }
 
+        seeUserInfo()
+
+    }
+
+    private fun seeUserInfo() {
+        binding.imageView3.setOnClickListener {
+            findNavController().navigate(R.id.action_profileFragment_to_userInfoFragment)
+        }
     }
 
     private fun initiateUser() {
         auth = Firebase.auth
         firebaseUser = auth.currentUser!!
+        Log.i("FBTEST", "${firebaseUser.uid}")
+
     }
 
 

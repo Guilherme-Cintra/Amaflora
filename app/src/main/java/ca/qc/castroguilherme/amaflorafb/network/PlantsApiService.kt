@@ -1,7 +1,7 @@
 package ca.qc.castroguilherme.amaflorafb.network
 
-import ca.qc.castroguilherme.amaflorafb.models.AllPlantsReponse
-import ca.qc.castroguilherme.amaflorafb.models.DetailResponse
+import ca.qc.castroguilherme.amaflorafb.models.plantdbmodel.AllPlantsReponse
+import ca.qc.castroguilherme.amaflorafb.models.plantdbmodel.DetailResponse
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path

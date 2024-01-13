@@ -5,6 +5,9 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AnimationUtils
+import ca.qc.castroguilherme.amaflorafb.databinding.FragmentDiscoverBinding
+import ca.qc.castroguilherme.amaflorafb.databinding.FragmentFavouritesBinding
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -21,6 +24,7 @@ class FavouritesFragment : Fragment() {
     private var param1: String? = null
     private var param2: String? = null
 
+    private lateinit var binding: FragmentFavouritesBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
@@ -34,7 +38,16 @@ class FavouritesFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_favourites, container, false)
+        binding = FragmentFavouritesBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        val top_anim = AnimationUtils.loadAnimation(requireContext(), R.anim.top_animation )
+        val bottom_anim = AnimationUtils.loadAnimation(requireContext(), R.anim.bottom_animation )
+        binding.cardNothing.startAnimation(bottom_anim)
+        binding.cardTitle.startAnimation(top_anim)
     }
 
     companion object {

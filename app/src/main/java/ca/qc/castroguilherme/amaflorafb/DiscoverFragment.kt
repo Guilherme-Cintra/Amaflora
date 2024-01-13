@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AnimationUtils
 import androidx.core.widget.addTextChangedListener
 import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.Observer
@@ -59,6 +60,10 @@ class DiscoverFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val top_anim = AnimationUtils.loadAnimation(requireContext(), R.anim.top_animation )
+        binding.cardImage.startAnimation(top_anim)
+
+
         searchPlant()
 
         clickPlant()
@@ -81,6 +86,7 @@ class DiscoverFragment : Fragment() {
 
     fun searchPlant(){
         binding.editTextText.doAfterTextChanged {
+            binding.cardImage.visibility = View.GONE
             plantsViewModel.searchPlant(it.toString().trim())
         }
         binding.discoverPlantsRv.adapter = discoverAdapter

@@ -9,12 +9,20 @@
         android:id="@+id/profileFragment"
         android:name="ca.qc.castroguilherme.amaflorafb.ProfileFragment"
         android:label="fragment_profile"
-        tools:layout="@layout/fragment_profile" />
+        tools:layout="@layout/fragment_profile" >
+        <action
+            android:id="@+id/action_profileFragment_to_userInfoFragment"
+            app:destination="@id/userInfoFragment" />
+    </fragment>
     <fragment
         android:id="@+id/identifyFragment2"
         android:name="ca.qc.castroguilherme.amaflorafb.IdentifyFragment"
         android:label="fragment_identify"
-        tools:layout="@layout/fragment_identify" />
+        tools:layout="@layout/fragment_identify" >
+        <action
+            android:id="@+id/action_identifyFragment2_to_profileFragment"
+            app:destination="@id/profileFragment" />
+    </fragment>
     <fragment
         android:id="@+id/discoverFragment"
         android:name="ca.qc.castroguilherme.amaflorafb.DiscoverFragment"
@@ -31,7 +39,7 @@
         tools:layout="@layout/fragment_discover_detail" >
         <argument
             android:name="plant"
-            app:argType="ca.qc.castroguilherme.amaflorafb.models.Data" />
+            app:argType="ca.qc.castroguilherme.amaflorafb.models.plantdbmodel.Data" />
     </fragment>
     <fragment
         android:id="@+id/favouritesFragment2"
@@ -43,4 +51,13 @@
         android:name="ca.qc.castroguilherme.amaflorafb.HistoryFragment"
         android:label="fragment_history"
         tools:layout="@layout/fragment_history" />
+    <fragment
+        android:id="@+id/userInfoFragment"
+        android:name="ca.qc.castroguilherme.amaflorafb.UserInfoFragment"
+        android:label="fragment_user_info"
+        tools:layout="@layout/fragment_user_info" >
+        <action
+            android:id="@+id/action_userInfoFragment_to_profileFragment"
+            app:destination="@id/profileFragment" />
+    </fragment>
 </navigation>

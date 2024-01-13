@@ -1,4 +1,4 @@
-package ca.qc.castroguilherme.amaflorafb.models
+package ca.qc.castroguilherme.amaflorafb.models.plantdbmodel
 
 
 import com.google.gson.annotations.SerializedName

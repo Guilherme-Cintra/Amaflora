@@ -6,8 +6,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 
 import kotlinx.coroutines.launch
-import ca.qc.castroguilherme.amaflorafb.models.AllPlantsReponse
-import ca.qc.castroguilherme.amaflorafb.models.DetailResponse
+import ca.qc.castroguilherme.amaflorafb.models.plantdbmodel.AllPlantsReponse
+import ca.qc.castroguilherme.amaflorafb.models.plantdbmodel.DetailResponse
 
 
 class PlantsViewModel(private val plantsRepository: PlantRepository):ViewModel() {

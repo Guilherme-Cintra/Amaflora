@@ -40,6 +40,9 @@
         <argument
             android:name="plant"
             app:argType="ca.qc.castroguilherme.amaflorafb.models.plantdbmodel.Data" />
+        <action
+            android:id="@+id/action_discoverDetailFragment_to_addPlantFragment"
+            app:destination="@id/addPlantFragment" />
     </fragment>
     <fragment
         android:id="@+id/favouritesFragment2"
@@ -60,4 +63,9 @@
             android:id="@+id/action_userInfoFragment_to_profileFragment"
             app:destination="@id/profileFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/addPlantFragment"
+        android:name="ca.qc.castroguilherme.amaflorafb.AddPlantFragment"
+        android:label="fragment_add_plant"
+        tools:layout="@layout/fragment_add_plant" />
 </navigation>

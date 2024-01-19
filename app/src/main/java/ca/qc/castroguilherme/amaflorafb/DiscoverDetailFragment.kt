@@ -1,6 +1,7 @@
 package ca.qc.castroguilherme.amaflorafb
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -10,10 +11,23 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import ca.qc.castroguilherme.amaflorafb.databinding.FragmentDiscoverDetailBinding
+import ca.qc.castroguilherme.amaflorafb.models.amafloraDB.CreatePlant
+import ca.qc.castroguilherme.amaflorafb.models.amafloraDB.Recherche
+import ca.qc.castroguilherme.amaflorafb.models.amafloraDB.RechercheBody
+import ca.qc.castroguilherme.amaflorafb.viewModel.plantsViewModel.AmaFloraViewModel.AmaFloraRepository
+import ca.qc.castroguilherme.amaflorafb.viewModel.plantsViewModel.AmaFloraViewModel.AmaFloraViewModel
+import ca.qc.castroguilherme.amaflorafb.viewModel.plantsViewModel.AmaFloraViewModel.AmaFloraViewModelProviderFactory
 import ca.qc.castroguilherme.amaflorafb.viewModel.plantsViewModel.discoverPlantViewModel.PlantRepository
 import ca.qc.castroguilherme.amaflorafb.viewModel.plantsViewModel.discoverPlantViewModel.PlantViewModelProviderFactory
 import ca.qc.castroguilherme.amaflorafb.viewModel.plantsViewModel.discoverPlantViewModel.PlantsViewModel
 import com.bumptech.glide.Glide
+import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.auth
+import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.util.Date
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -30,10 +44,22 @@ class DiscoverDetailFragment : Fragment() {
     private var param1: String? = null
     private var param2: String? = null
     private val args: DiscoverDetailFragmentArgs by navArgs()
+
+    //Firebase
+    lateinit var auth: FirebaseAuth
+    lateinit var firebaseUser: FirebaseUser
+
     val plantsRepo = PlantRepository()
     val plantsViewModel : PlantsViewModel by lazy {
         ViewModelProvider(this, PlantViewModelProviderFactory(plantsRepo)).get(
             PlantsViewModel::class.java
+        )
+    }
+
+    private val amaFloraRepository = AmaFloraRepository()
+    val amaFloraViewModel : AmaFloraViewModel by lazy {
+        ViewModelProvider(this, AmaFloraViewModelProviderFactory(amaFloraRepository)).get(
+            AmaFloraViewModel::class.java
         )
     }
 
@@ -61,6 +87,9 @@ class DiscoverDetailFragment : Fragment() {
 
 
         val plant = args.plant
+        val id = plant.id
+        Log.i("MyApi", "id : ${id}")
+
         plantsViewModel.getDetail(plant.id)
         plantsViewModel.detailPlant.observe(viewLifecycleOwner, Observer {
                 response ->
@@ -76,10 +105,46 @@ class DiscoverDetailFragment : Fragment() {
 
             binding.nameLbl.text = response.commonName
             binding.textDescription.text = response.description
-            binding.careTxt.text = care(response.careLevel.toString())
+             if (care(response.careLevel) != null) {
+                 binding.careTxt.text = care(response.careLevel)
+             }
+
+            val sun = sun(response.sunlight)
+
+            response.description
+
+            val createPlant = CreatePlant(response.description, response.wateringGeneralBenchmark.value, plant.id, response.defaultImage.thumbnail, response.careLevel, response.commonName, response.scientificName[0], sun, response.wateringGeneralBenchmark.unit )
+            amaFloraViewModel.createPlant(createPlant)
+            amaFloraViewModel.platCreationResponse.observe(viewLifecycleOwner, Observer {
+                response ->
+                Log.i("MyApi", "${response.newPlant?.description}")
+            })
+
+            auth = Firebase.auth
+            firebaseUser = auth.currentUser!!
+            val sdf = SimpleDateFormat("dd/M/yyyy hh:mm:ss")
+            val currentDate = sdf.format(Date())
+            val recherche = RechercheBody(currentDate.toString(), id, firebaseUser.uid.toString())
+
+            Log.i("MyApi", "date : ${recherche.date}")
+            Log.i("MyApi", "id : ${recherche.plantId}}")
+            Log.i("MyApi", "uid : ${recherche.userId}")
+
+            amaFloraViewModel.sauvegarderRecherche(recherche)
+
+            amaFloraViewModel.rechercheSauvegardeResponse.observe(viewLifecycleOwner, Observer {
+                response ->
+                if (response.recherche != null) {
+                    Log.i("MyApi", "recherche sauvegardée date : ${response.recherche.date}")
+                }
+            })
+
         })
 
 
+        binding.buttonAdd.setOnClickListener {
+            findNavController().navigate(R.id.action_discoverDetailFragment_to_addPlantFragment)
+        }
         back()
 
     }
@@ -90,9 +155,20 @@ class DiscoverDetailFragment : Fragment() {
         }
     }
 
+//    private fun descriptionMax(desc: String) :String {
+//        if (desc.length > 255){
+//            desc.chars()
+//            for (i in 0..<255){
+//
+//            }
+//        }
+//
+//            return  desc
+//    }
 
     private fun detail() {
         val plant = args.plant
+        Log.i("DetailError", "plant id: ${plant.id}")
         plantsViewModel.getDetail(plant.id)
         plantsViewModel.detailPlant.observe(viewLifecycleOwner, Observer {
             response ->
@@ -109,9 +185,36 @@ class DiscoverDetailFragment : Fragment() {
             binding.nameLbl.text = response.commonName
             binding.textDescription.text = response.description
             binding.careTxt.text = care(response.careLevel.toString())
+
+
         })
     }
 
+    private fun sun(plants: List<String>) :String {
+        when (plants.size) {
+            1 -> {
+                if (plants.contains("full sun")) {
+                    return "4 to 6 hours "
+                } else  if (plants.contains("part shade") || plants.contains("part sun/part shade")) {
+                    return "2 hours"
+                } else {
+                    return "careful"
+                }
+            }
+            2 -> {
+                if (plants.contains("full sun") && plants.contains("part shade") || plants.contains("full sun") && plants.contains("part sun/part shade")) {
+                    return  "2 to 6 hours"
+
+                } else if (plants.contains("part shade") && plants.contains("filtered shade")) {
+                    return  "0 to 2 hours"
+                }
+            }
+            3 -> {
+                return  "no worries"
+            }
+        }
+        return  "no worries"
+    }
     private fun care(lvl:String):String{
         when (lvl) {
             "Medium" -> {

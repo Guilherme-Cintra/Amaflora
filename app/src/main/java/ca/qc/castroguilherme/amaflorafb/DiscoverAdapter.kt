@@ -20,7 +20,7 @@ class DiscoverAdapter() : RecyclerView.Adapter<DiscoverAdapter.PlantViewHolder>(
         var plantImage: ImageView = itemView.findViewById(R.id.image_plant)
         val plantName: TextView = itemView.findViewById(R.id.plant_common_name)
 //        var scientificName: TextView = itemView.findViewById(R.id.scientific_lbl)
-        var sunReq: TextView = itemView.findViewById(R.id.sun_req)
+        var sunReq: TextView = itemView.findViewById(R.id.water_requirement)
         var waterReq: TextView = itemView.findViewById(R.id.water_req)
 
     }

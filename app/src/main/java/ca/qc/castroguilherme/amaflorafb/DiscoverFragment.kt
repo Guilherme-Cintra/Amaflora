@@ -13,9 +13,18 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import ca.qc.castroguilherme.amaflorafb.databinding.FragmentDiscoverBinding
+import ca.qc.castroguilherme.amaflorafb.models.amafloraDB.GetHistoriqueBody
+import ca.qc.castroguilherme.amaflorafb.models.amafloraDB.Plant
+import ca.qc.castroguilherme.amaflorafb.viewModel.plantsViewModel.AmaFloraViewModel.AmaFloraRepository
+import ca.qc.castroguilherme.amaflorafb.viewModel.plantsViewModel.AmaFloraViewModel.AmaFloraViewModel
+import ca.qc.castroguilherme.amaflorafb.viewModel.plantsViewModel.AmaFloraViewModel.AmaFloraViewModelProviderFactory
 import ca.qc.castroguilherme.amaflorafb.viewModel.plantsViewModel.discoverPlantViewModel.PlantRepository
 import ca.qc.castroguilherme.amaflorafb.viewModel.plantsViewModel.discoverPlantViewModel.PlantViewModelProviderFactory
 import ca.qc.castroguilherme.amaflorafb.viewModel.plantsViewModel.discoverPlantViewModel.PlantsViewModel
+import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.auth
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -31,12 +40,27 @@ class DiscoverFragment : Fragment() {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
-    private lateinit var binding:FragmentDiscoverBinding
+    private lateinit var binding: FragmentDiscoverBinding
+
+    //Firebase
+    lateinit var auth: FirebaseAuth
+    lateinit var firebaseUser: FirebaseUser
+
+
     val discoverAdapter = DiscoverAdapter()
+    val historiqueAdapter = HistoriqueAdapter()
+
     val plantsRepo = PlantRepository()
-    val plantsViewModel : PlantsViewModel by lazy {
+    val plantsViewModel: PlantsViewModel by lazy {
         ViewModelProvider(this, PlantViewModelProviderFactory(plantsRepo)).get(
             PlantsViewModel::class.java
+        )
+    }
+
+    val amaFloraRepository = AmaFloraRepository()
+    val amaFloraViewModel: AmaFloraViewModel by lazy {
+        ViewModelProvider(this, AmaFloraViewModelProviderFactory(amaFloraRepository)).get(
+            AmaFloraViewModel::class.java
         )
     }
 
@@ -53,46 +77,77 @@ class DiscoverFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        binding = FragmentDiscoverBinding.inflate(inflater,container, false)
+        binding = FragmentDiscoverBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val top_anim = AnimationUtils.loadAnimation(requireContext(), R.anim.top_animation )
+        val top_anim = AnimationUtils.loadAnimation(requireContext(), R.anim.top_animation)
         binding.cardImage.startAnimation(top_anim)
 
 
+        historique()
         searchPlant()
 
         clickPlant()
 
+
+
+
+    }
+
+    private fun historique() {
+        auth = Firebase.auth
+        firebaseUser = auth.currentUser!!
+        binding.recentPlantsRv.visibility  = View.VISIBLE
+//        var plants = mutableListOf<Plant>()
+
+        amaFloraViewModel.getHistorique(firebaseUser.uid)
+        amaFloraViewModel.plantsLiveData.observe(viewLifecycleOwner, Observer {
+                plants ->
+
+            plants?.forEach {
+                Log.i("plantIn", "fragment plants ${it.id}")
+            }
+
+            if (plants != null) {
+                binding.recentPlantsRv.adapter = historiqueAdapter
+                binding.discoverPlantsRv.visibility = View.GONE
+
+                historiqueAdapter.setPlants(plants)
+
+                binding.cardImage.visibility = View.GONE
+            }
+        })
     }
 
 
-
-
-    fun clickPlant(){
+    fun clickPlant() {
         discoverAdapter.setOnItemClickListener {
             val bundle = Bundle().apply {
                 putSerializable("plant", it)
             }
-            findNavController().navigate( R.id.action_discoverFragment_to_discoverDetailFragment,
+            findNavController().navigate(
+                R.id.action_discoverFragment_to_discoverDetailFragment,
                 bundle
             )
         }
     }
 
-    fun searchPlant(){
+    fun searchPlant() {
         binding.editTextText.doAfterTextChanged {
             binding.cardImage.visibility = View.GONE
             plantsViewModel.searchPlant(it.toString().trim())
+            binding.recentPlantsRv.visibility = View.GONE
+
         }
         binding.discoverPlantsRv.adapter = discoverAdapter
-        plantsViewModel.allPlants.observe( viewLifecycleOwner, Observer { response ->
+        plantsViewModel.allPlants.observe(viewLifecycleOwner, Observer { response ->
             discoverAdapter.setDiscoverPlants(response.data)
             Log.i("testing", "${response.data.size}")
+            binding.discoverPlantsRv.visibility = View.VISIBLE
         })
     }
 

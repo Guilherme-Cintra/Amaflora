@@ -10,8 +10,15 @@ import android.view.View
 import android.view.ViewGroup
 
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.lifecycle.ViewModelProvider
 
 import ca.qc.castroguilherme.amaflorafb.databinding.FragmentLoginBinding
+import ca.qc.castroguilherme.amaflorafb.models.amafloraDB.User
+import ca.qc.castroguilherme.amaflorafb.viewModel.plantsViewModel.AmaFloraViewModel.AmaFloraRepository
+import ca.qc.castroguilherme.amaflorafb.viewModel.plantsViewModel.AmaFloraViewModel.AmaFloraViewModel
+import ca.qc.castroguilherme.amaflorafb.viewModel.plantsViewModel.AmaFloraViewModel.AmaFloraViewModelProviderFactory
+import ca.qc.castroguilherme.amaflorafb.viewModel.plantsViewModel.discoverPlantViewModel.PlantViewModelProviderFactory
+import ca.qc.castroguilherme.amaflorafb.viewModel.plantsViewModel.discoverPlantViewModel.PlantsViewModel
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -42,6 +49,12 @@ class LoginFragment : Fragment() {
     private lateinit var binding: FragmentLoginBinding
 
 
+    private val amaFloraRepository = AmaFloraRepository()
+    val amaFloraViewModel : AmaFloraViewModel by lazy {
+        ViewModelProvider(this, AmaFloraViewModelProviderFactory(amaFloraRepository)).get(
+            AmaFloraViewModel::class.java
+        )
+    }
 
     // [START declare_auth]
     private lateinit var auth: FirebaseAuth
@@ -148,7 +161,13 @@ class LoginFragment : Fragment() {
                     // Sign in success, update UI with the signed-in user's information
                     Log.d(TAG, "signInWithCredential:success")
                     val user = auth.currentUser
-                    Log.d(TAG, "${user?.displayName}")
+                    val userAmaFlora = User(user?.displayName.toString(), user?.email.toString(), user?.photoUrl.toString(), user?.uid.toString())
+                    amaFloraViewModel.saveUser(userAmaFlora)
+                    Log.d(TAG, "Name : ${user?.displayName}")
+                    Log.d(TAG, "Uid : ${user?.uid}")
+                    Log.d(TAG, "Email : ${user?.email}")
+
+
                     loggedIn()
                 } else {
                     // If sign in fails, display a message to the user.
@@ -160,7 +179,10 @@ class LoginFragment : Fragment() {
 
  fun loggedIn(){
     val currentUser = auth.currentUser
+
     if (currentUser!= null){
+        val userAmaFlora = User(currentUser?.displayName.toString(), currentUser?.email.toString(), currentUser?.photoUrl.toString(), currentUser?.uid.toString())
+        amaFloraViewModel.saveUser(userAmaFlora)
         val intent = Intent(requireActivity(), HomeActivity::class.java)
         startActivity(intent)
     }

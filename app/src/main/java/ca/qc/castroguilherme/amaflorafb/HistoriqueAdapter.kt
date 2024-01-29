@@ -14,13 +14,14 @@ import com.bumptech.glide.Glide
 class HistoriqueAdapter(): RecyclerView.Adapter<HistoriqueAdapter.PlantViewHolder>() {
 
     private var plants: List<Plant> = emptyList()
+    private lateinit var onItemClickListener: ((Plant) -> Unit)
     inner class PlantViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
         var plantImage: ImageView = itemView.findViewById(R.id.plant_img)
         val plantName: TextView = itemView.findViewById(R.id.plantName)
 //        //        var scientificName: TextView = itemView.findViewById(R.id.scientific_lbl)
-//        var sunReq: TextView = itemView.findViewById(R.id.sun_req)
-//        var waterReq: TextView = itemView.findViewById(R.id.water_req)
+        var sunReq: TextView = itemView.findViewById(R.id.water_requirement)
+        var waterReq: TextView = itemView.findViewById(R.id.textView12)
 
     }
 
@@ -36,6 +37,9 @@ class HistoriqueAdapter(): RecyclerView.Adapter<HistoriqueAdapter.PlantViewHolde
 
     override fun getItemCount() = plants.size
 
+    fun setOnItemClickListener(listener: (Plant) -> Unit){
+        onItemClickListener = listener
+    }
     override fun onBindViewHolder(holder: PlantViewHolder, position: Int) {
 
         val plant = plants[position]
@@ -49,5 +53,11 @@ class HistoriqueAdapter(): RecyclerView.Adapter<HistoriqueAdapter.PlantViewHolde
 
         }
         holder.plantName.text = plant.nomCommun
+        holder.itemView.setOnClickListener {
+            onItemClickListener(plant)
+        }
+
+        holder.sunReq.text = plant.soleil
+        holder.waterReq.text = plant.freqEau + " " + plant.uniteFreqEau
     }
 }

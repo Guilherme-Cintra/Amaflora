@@ -5,13 +5,47 @@
     android:id="@+id/frameLayout6"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/linear_discover"
+    android:background="@color/my_light_primary"
     android:elevation="20dp"
     tools:context=".DiscoverDetailFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/btn_save"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:clickable="true"
+            android:src="@drawable/baseline_favorite_24"
+            app:backgroundTint="@color/mainGreen"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/textView8"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Save"
+            android:textColor="@color/black"
+            app:layout_constraintEnd_toEndOf="@+id/btn_save"
+            app:layout_constraintStart_toStartOf="@+id/btn_save"
+            app:layout_constraintTop_toBottomOf="@+id/btn_save" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/btn_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:clickable="true"
+            android:src="@drawable/baseline_arrow_back_24"
+            app:backgroundTint="@color/mainGreen"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <ScrollView
             android:layout_width="match_parent"
@@ -26,12 +60,14 @@
 
                 <androidx.cardview.widget.CardView
                     android:id="@+id/cardView3"
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    app:cardBackgroundColor="@color/mainGreen"
                     app:cardCornerRadius="5dp"
                     app:cardElevation="5dp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="@+id/image_url"
+                    app:layout_constraintStart_toStartOf="@+id/image_url"
                     app:layout_constraintTop_toBottomOf="@+id/image_url">
 
                     <androidx.constraintlayout.widget.ConstraintLayout
@@ -42,11 +78,13 @@
                             android:id="@+id/name_lbl"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_marginStart="16dp"
                             android:layout_marginTop="8dp"
+                            android:layout_marginEnd="16dp"
                             android:layout_marginBottom="8dp"
                             android:gravity="center"
                             android:text="Planta Nome"
-                            android:textColor="@color/black"
+                            android:textColor="@color/mainGreen2"
                             android:textSize="24sp"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
@@ -55,10 +93,11 @@
                     </androidx.constraintlayout.widget.ConstraintLayout>
                 </androidx.cardview.widget.CardView>
 
-                <ImageView
+                <de.hdodenhof.circleimageview.CircleImageView
                     android:id="@+id/image_url"
-                    android:layout_width="match_parent"
-                    android:layout_height="400dp"
+                    android:layout_width="200dp"
+                    android:layout_height="200dp"
+                    android:layout_marginTop="16dp"
                     android:src="@drawable/baseline_forest_24"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -68,7 +107,8 @@
                     android:id="@+id/cardView5"
                     android:layout_width="0dp"
                     android:layout_height="500dp"
-                    android:layout_marginTop="24dp"
+                    android:layout_marginTop="8dp"
+                    app:cardBackgroundColor="@color/my_light_primary"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/cardView3">
@@ -101,6 +141,7 @@
                                     android:layout_marginEnd="16dp"
                                     android:layout_marginBottom="8dp"
                                     android:text="TextView"
+                                    android:textColor="@color/mainGreen2"
                                     android:textSize="24sp"
                                     app:layout_constraintBottom_toBottomOf="parent"
                                     app:layout_constraintEnd_toEndOf="parent"
@@ -114,8 +155,9 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="24dp"
-                            android:layout_marginTop="32dp"
+                            android:layout_marginTop="8dp"
                             android:text="@string/care_lvl_lbl"
+                            android:textColor="@color/mainGreen2"
                             android:textSize="24sp"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toBottomOf="@+id/species_lbl" />
@@ -126,6 +168,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="16dp"
                             android:text="@string/species_text"
+                            android:textColor="@color/mainGreen2"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
@@ -156,9 +199,9 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="16dp"
-                            android:layout_marginTop="32dp"
+                            android:layout_marginTop="8dp"
                             android:layout_marginEnd="16dp"
-                            android:background="@drawable/linear_discover"
+                            app:cardBackgroundColor="@color/mainGreen"
                             app:cardCornerRadius="20dp"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
@@ -166,8 +209,7 @@
 
                             <androidx.constraintlayout.widget.ConstraintLayout
                                 android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:background="@drawable/linear_discover">
+                                android:layout_height="match_parent">
 
                                 <TextView
                                     android:id="@+id/text_description"
@@ -179,7 +221,7 @@
                                     android:layout_marginBottom="16dp"
                                     android:gravity="center"
                                     android:text="European Silver Fir (Abies alba) is an amazing coniferous species native to mountainous regions of central Europe and the Balkans. It is an evergreen tree with a narrow, pyramidal shape and long, soft needles. Its bark is scaly grey-brown and its branches are highly ornamental due to its conical-shaped silver-tinged needles. It is pruned for use as an ornamental evergreen hedging and screening plant, and is also popular for use as a Christmas tree. Young trees grow quickly and have strong, flexible branches which makes them perfect for use as windbreaks. The European Silver Fir is an impressive species, making it ideal for gardens and public spaces."
-                                    android:textColor="@color/black"
+                                    android:textColor="@color/mainGreen2"
                                     app:layout_constraintBottom_toBottomOf="parent"
                                     app:layout_constraintEnd_toEndOf="parent"
                                     app:layout_constraintStart_toStartOf="parent"
@@ -191,64 +233,30 @@
 
                 </androidx.cardview.widget.CardView>
 
-                <com.google.android.material.floatingactionbutton.FloatingActionButton
-                    android:id="@+id/btn_save"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginEnd="16dp"
-                    android:clickable="true"
-                    android:src="@drawable/baseline_favorite_24"
-                    app:backgroundTint="@color/red"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <TextView
-                    android:id="@+id/textView8"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Save"
-                    android:textColor="@color/black"
-                    app:layout_constraintEnd_toEndOf="@+id/btn_save"
-                    app:layout_constraintStart_toStartOf="@+id/btn_save"
-                    app:layout_constraintTop_toBottomOf="@+id/btn_save" />
-
-                <com.google.android.material.floatingactionbutton.FloatingActionButton
-                    android:id="@+id/btn_back"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginTop="16dp"
-                    android:clickable="true"
-                    android:src="@drawable/baseline_arrow_back_24"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
             </androidx.constraintlayout.widget.ConstraintLayout>
         </ScrollView>
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/mainGreen"
-            android:backgroundTint="@color/mainGreen"
+            android:background="@color/my_light_primary"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent">
 
             <Button
                 android:id="@+id/buttonAdd"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="32dp"
                 android:layout_marginTop="16dp"
+                android:layout_marginEnd="32dp"
                 android:layout_marginBottom="16dp"
-                android:backgroundTint="@color/my_light_primary"
+                android:backgroundTint="@color/mainGreen"
                 android:elevation="30dp"
                 android:text="Add plant"
-                android:textAllCaps="false"
-                android:textColor="@color/black"
-                android:textSize="20sp"
-                app:cornerRadius="20dp"
+                android:textColor="@color/mainGreen2"
+                android:textSize="16sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

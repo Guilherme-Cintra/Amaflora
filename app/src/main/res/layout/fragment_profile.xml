@@ -13,8 +13,8 @@
         android:id="@+id/constraintLayout"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:background="@drawable/jardin"
-        android:alpha="0.5"
+        android:background="@color/mainGreen"
+
 
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -68,6 +68,7 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
                 android:layout_marginBottom="16dp"
+                android:elevation="20dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
@@ -102,6 +103,7 @@
             android:layout_marginBottom="32dp"
             android:clickable="true"
             android:src="@drawable/baseline_add_24"
+            android:visibility="gone"
             app:backgroundTint="@color/my_light_primary"
             app:layout_constraintBottom_toBottomOf="@id/cl"
             app:layout_constraintEnd_toEndOf="@id/cl" />

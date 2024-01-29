@@ -2,6 +2,8 @@ package ca.qc.castroguilherme.amaflorafb.models.amafloraDB
 
 
 import com.google.gson.annotations.SerializedName
+import java.io.Serializable
+
 
 data class ListPlantsItem(
     @SerializedName("debut_darrosage_date")
@@ -24,4 +26,4 @@ data class ListPlantsItem(
     val surnom: String,
     @SerializedName("userUid")
     val userUid: String
-)
+):Serializable

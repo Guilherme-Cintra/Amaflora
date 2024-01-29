@@ -1,5 +1,6 @@
 package ca.qc.castroguilherme.amaflorafb
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -56,6 +57,11 @@ class UserInfoFragment : Fragment() {
        showInfoUser()
         binding.floatingActionButton2.setOnClickListener {
             findNavController().navigate(R.id.action_userInfoFragment_to_profileFragment)
+        }
+
+        binding.cardLogout.setOnClickListener {
+            auth.signOut()
+            startActivity(Intent(requireActivity().baseContext, MainActivity::class.java))
         }
     }
 

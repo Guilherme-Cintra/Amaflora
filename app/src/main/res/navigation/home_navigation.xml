@@ -13,6 +13,9 @@
         <action
             android:id="@+id/action_profileFragment_to_userInfoFragment"
             app:destination="@id/userInfoFragment" />
+        <action
+            android:id="@+id/action_profileFragment_to_ownedPlantsDetailFragment"
+            app:destination="@id/ownedPlantsDetailFragment" />
     </fragment>
     <fragment
         android:id="@+id/identifyFragment2"
@@ -22,6 +25,9 @@
         <action
             android:id="@+id/action_identifyFragment2_to_profileFragment"
             app:destination="@id/profileFragment" />
+        <action
+            android:id="@+id/action_identifyFragment2_to_historyFragment2"
+            app:destination="@id/historyFragment2" />
     </fragment>
     <fragment
         android:id="@+id/discoverFragment"
@@ -37,18 +43,22 @@
         android:name="ca.qc.castroguilherme.amaflorafb.DiscoverDetailFragment"
         android:label="fragment_discover_detail"
         tools:layout="@layout/fragment_discover_detail" >
-        <argument
-            android:name="plant"
-            app:argType="ca.qc.castroguilherme.amaflorafb.models.plantdbmodel.Data" />
         <action
             android:id="@+id/action_discoverDetailFragment_to_addPlantFragment"
             app:destination="@id/addPlantFragment" />
+        <argument
+            android:name="id"
+            app:argType="integer" />
     </fragment>
     <fragment
         android:id="@+id/favouritesFragment2"
         android:name="ca.qc.castroguilherme.amaflorafb.FavouritesFragment"
         android:label="fragment_favourites"
-        tools:layout="@layout/fragment_favourites" />
+        tools:layout="@layout/fragment_favourites" >
+        <action
+            android:id="@+id/action_favouritesFragment2_to_discoverDetailFragment"
+            app:destination="@id/discoverDetailFragment" />
+    </fragment>
     <fragment
         android:id="@+id/historyFragment2"
         android:name="ca.qc.castroguilherme.amaflorafb.HistoryFragment"
@@ -67,5 +77,24 @@
         android:id="@+id/addPlantFragment"
         android:name="ca.qc.castroguilherme.amaflorafb.AddPlantFragment"
         android:label="fragment_add_plant"
-        tools:layout="@layout/fragment_add_plant" />
+        tools:layout="@layout/fragment_add_plant" >
+        <action
+            android:id="@+id/action_addPlantFragment_to_profileFragment"
+            app:destination="@id/profileFragment" />
+        <argument
+            android:name="id"
+            app:argType="integer" />
+    </fragment>
+    <fragment
+        android:id="@+id/ownedPlantsDetailFragment"
+        android:name="ca.qc.castroguilherme.amaflorafb.OwnedPlantsDetailFragment"
+        android:label="fragment_owned_plants_detail"
+        tools:layout="@layout/fragment_owned_plants_detail" >
+        <action
+            android:id="@+id/action_ownedPlantsDetailFragment_to_profileFragment"
+            app:destination="@id/profileFragment" />
+        <argument
+            android:name="plant"
+            app:argType="ca.qc.castroguilherme.amaflorafb.models.amafloraDB.ListPlantsItem" />
+    </fragment>
 </navigation>

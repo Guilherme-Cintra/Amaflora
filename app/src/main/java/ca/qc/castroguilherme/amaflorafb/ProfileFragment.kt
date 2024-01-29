@@ -68,7 +68,6 @@ class ProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-
         initiateUser()
 
         binding.hello.setText("${binding.hello.text} ${firebaseUser.displayName}")
@@ -76,6 +75,13 @@ class ProfileFragment : Fragment() {
         binding.imageView3.apply {
             Glide.with(this).load(firebaseUser.photoUrl).into(binding.imageView3)
 
+        }
+        ownedPlantAdapter.setOnItemClickListener {
+            val bundle = Bundle().apply { putSerializable("plant", it) }
+            findNavController().navigate(
+                R.id.action_profileFragment_to_ownedPlantsDetailFragment,
+                bundle
+            )
         }
 
         seeUserInfo()
@@ -86,7 +92,7 @@ class ProfileFragment : Fragment() {
     private fun displayOwnedPlants() {
         amaFloraViewModel.getUserPlants(firebaseUser.uid)
         amaFloraViewModel.userPlantsReponse.observe(viewLifecycleOwner, Observer { response ->
-            if (!response.isEmpty()){
+            if (!response.isEmpty()) {
                 binding.ownedPlantsRv.adapter = ownedPlantAdapter
                 ownedPlantAdapter.setPlants(response)
             }

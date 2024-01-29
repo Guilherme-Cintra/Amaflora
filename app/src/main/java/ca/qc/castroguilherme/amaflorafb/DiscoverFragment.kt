@@ -94,6 +94,7 @@ class DiscoverFragment : Fragment() {
         clickPlant()
 
 
+        clickRecent()
 
 
     }
@@ -101,21 +102,23 @@ class DiscoverFragment : Fragment() {
     private fun historique() {
         auth = Firebase.auth
         firebaseUser = auth.currentUser!!
-        binding.recentPlantsRv.visibility  = View.VISIBLE
+//        binding.recentPlantsRv.visibility  = View.VISIBLE
 //        var plants = mutableListOf<Plant>()
 
         amaFloraViewModel.getHistorique(firebaseUser.uid)
         amaFloraViewModel.plantsLiveData.observe(viewLifecycleOwner, Observer {
                 plants ->
-
-            plants?.forEach {
-                Log.i("plantIn", "fragment plants ${it.id}")
-            }
+binding.progressBar2.visibility = View.GONE
+            binding.loadingText.visibility = View.GONE
+//            plants?.forEach {
+//                Log.i("plantIn", "fragment plants ${it.id}")
+//            }
 
             if (plants != null) {
                 binding.recentPlantsRv.adapter = historiqueAdapter
                 binding.discoverPlantsRv.visibility = View.GONE
 
+                binding.recent.visibility = View.VISIBLE
                 historiqueAdapter.setPlants(plants)
 
                 binding.cardImage.visibility = View.GONE
@@ -127,7 +130,7 @@ class DiscoverFragment : Fragment() {
     fun clickPlant() {
         discoverAdapter.setOnItemClickListener {
             val bundle = Bundle().apply {
-                putSerializable("plant", it)
+                putSerializable("id", it.id)
             }
             findNavController().navigate(
                 R.id.action_discoverFragment_to_discoverDetailFragment,
@@ -136,19 +139,38 @@ class DiscoverFragment : Fragment() {
         }
     }
 
-    fun searchPlant() {
-        binding.editTextText.doAfterTextChanged {
-            binding.cardImage.visibility = View.GONE
-            plantsViewModel.searchPlant(it.toString().trim())
-            binding.recentPlantsRv.visibility = View.GONE
+    fun clickRecent(){
+        historiqueAdapter.setOnItemClickListener {
+            val bundle = Bundle().apply {
+                putSerializable("id", it.id)
+            }
 
+            findNavController().navigate(
+                R.id.action_discoverFragment_to_discoverDetailFragment, bundle
+            )
         }
-        binding.discoverPlantsRv.adapter = discoverAdapter
-        plantsViewModel.allPlants.observe(viewLifecycleOwner, Observer { response ->
-            discoverAdapter.setDiscoverPlants(response.data)
-            Log.i("testing", "${response.data.size}")
-            binding.discoverPlantsRv.visibility = View.VISIBLE
-        })
+    }
+
+
+
+    fun searchPlant() {
+        binding.rechercheBtn.setOnClickListener {
+            binding.cardImage.visibility = View.GONE
+            plantsViewModel.searchPlant(binding.searchText.text.toString().trim())
+            binding.recentPlantsRv.visibility = View.GONE
+            binding.recent.visibility = View.GONE
+            binding.discoverPlantsRv.adapter = discoverAdapter
+            binding.progressBar2.visibility = View.VISIBLE
+            plantsViewModel.allPlants.observe(viewLifecycleOwner, Observer { response ->
+                binding.progressBar2.visibility = View.GONE
+
+                discoverAdapter.setDiscoverPlants(response.data)
+                Log.i("testing", "${response.data.size}")
+                binding.discoverPlantsRv.visibility = View.VISIBLE
+                binding.recent.visibility = View.GONE
+            })
+        }
+
     }
 
     companion object {

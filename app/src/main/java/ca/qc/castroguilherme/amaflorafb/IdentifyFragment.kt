@@ -29,9 +29,17 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 
 import ca.qc.castroguilherme.amaflorafb.databinding.FragmentIdentifyBinding
+import ca.qc.castroguilherme.amaflorafb.models.amafloraDB.CreateIdentification
+import ca.qc.castroguilherme.amaflorafb.viewModel.plantsViewModel.AmaFloraViewModel.AmaFloraRepository
+import ca.qc.castroguilherme.amaflorafb.viewModel.plantsViewModel.AmaFloraViewModel.AmaFloraViewModel
+import ca.qc.castroguilherme.amaflorafb.viewModel.plantsViewModel.AmaFloraViewModel.AmaFloraViewModelProviderFactory
 import ca.qc.castroguilherme.amaflorafb.viewModel.plantsViewModel.identifyPlantViewModel.PlantIdentificationRepository
 import ca.qc.castroguilherme.amaflorafb.viewModel.plantsViewModel.identifyPlantViewModel.PlantIdentificationViewModel
 import ca.qc.castroguilherme.amaflorafb.viewModel.plantsViewModel.identifyPlantViewModel.PlantIdentificationViewModelProviderFactory
+import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.auth
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -39,6 +47,7 @@ import java.io.File
 import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.Locale
+import kotlin.math.log
 
 
 // TODO: Rename parameter arguments, choose names that match
@@ -60,6 +69,17 @@ class IdentifyFragment : Fragment() {
     val parts: MutableList<MultipartBody.Part> = mutableListOf()
 
 
+    var image = "nothing yet"
+    //Firebase
+    lateinit var auth: FirebaseAuth
+    lateinit var firebaseUser: FirebaseUser
+
+    val amaFloraRepository = AmaFloraRepository()
+    val amaFloraViewModel: AmaFloraViewModel by lazy {
+        ViewModelProvider(this, AmaFloraViewModelProviderFactory(amaFloraRepository)).get(
+            AmaFloraViewModel::class.java
+        )
+    }
 
     private val plantIdRepo = PlantIdentificationRepository()
     private val plantIdentificationViewModel: PlantIdentificationViewModel by lazy {
@@ -94,6 +114,8 @@ class IdentifyFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        initiateUser()
+
         if (!hasPermissions(requireActivity().baseContext)) {
             activityResultLauncher.launch(REQUIRED_PERMISSIONS)
         } else {
@@ -102,33 +124,39 @@ class IdentifyFragment : Fragment() {
 
         binding.buttonPic.setOnClickListener {
             takePhoto()
+//            plantIdentificationViewModel.identificationResponse.observe(viewLifecycleOwner, Observer { response ->
+//
+//                response.bestMatch?.let { bestMatch ->
+//                    // Create the AlertDialog Builder
+//                    val builder = AlertDialog.Builder(requireContext())
+//                    builder.setTitle("Identification Result")
+//                    builder.setMessage("We believe that your plant belongs to this species : ${response.bestMatch}\nAlthough our accuracy is beyond 97% we still recomend you to be cautious with the results")
+//
+//                    builder.setPositiveButton("OK") { dialog, which ->
+//                    }
+//                    val dialog: AlertDialog = builder.create()
+//                    dialog.show()
+//                    val createIdentification = CreateIdentification(image, response.bestMatch.toString(), firebaseUser.uid)
+//                    amaFloraViewModel.postIdentification(createIdentification)
+//                    response
+//                }
+//
+//            })
         }
 
 
-        plantIdentificationViewModel.identificationResponse.observe(viewLifecycleOwner, Observer { response ->
 
-            response.bestMatch?.let { bestMatch ->
-                // Create the AlertDialog Builder
-                val builder = AlertDialog.Builder(requireContext())
-                builder.setTitle("Identification Result")
-                builder.setMessage("We believe that your plant belongs to this species : $bestMatch\nAlthough our accuracy is beyond 90% we still recomend you to be cautious with the results")
+    }
+    private fun initiateUser() {
+        auth = Firebase.auth
+        firebaseUser = auth.currentUser!!
 
 
-                builder.setPositiveButton("OK") { dialog, which ->
-                    findNavController().navigate(R.id.action_identifyFragment2_to_profileFragment)
-                }
-                val dialog: AlertDialog = builder.create()
-                dialog.show()
-            }
-
-
-
-        })
     }
 
 
-
     private fun takePhoto() {
+        Log.i("idenSuccess", "picture taken")
 //        val name = "images"
         val name = SimpleDateFormat(FILENAME_FORMAT, Locale.US)
             .format(System.currentTimeMillis())
@@ -159,8 +187,12 @@ class IdentifyFragment : Fragment() {
 
                 override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
                     val msg = "Succes taking picture ${outputFileResults.savedUri}"
-                    Toast.makeText(requireActivity().baseContext, "Success taking picture", Toast.LENGTH_LONG)
-                        .show()
+//                    Toast.makeText(requireActivity().baseContext, "Success taking picture", Toast.LENGTH_LONG)
+//                        .show()
+                    binding.squaree?.visibility = View.GONE
+                    binding.progressBar?.visibility = View.VISIBLE
+                    binding.buttonPic.isClickable = false
+
                     Log.i(TAG, msg)
                     displaySucces(outputFileResults.savedUri)
                     val images = outputFileResults.savedUri?.let {it ->
@@ -168,12 +200,60 @@ class IdentifyFragment : Fragment() {
                             it
                         )
                     }
-                    images?.let { it -> parts.add(it) }
+                    images?.let { it ->
+                        parts.clear()
+                        Log.i("idenSuccess", parts.size.toString())
+                        parts.add(it) }
                     plantIdentificationViewModel.identify("all", parts)
+
+
+                    plantIdentificationViewModel.identificationResponse.observe(viewLifecycleOwner, Observer {
+                        response ->
+                        if(response?.bestMatch != null){
+
+                            binding.squaree?.visibility = View.VISIBLE
+                            binding.progressBar?.visibility = View.GONE
+                            binding.buttonPic.isClickable = true
+                            val builder = AlertDialog.Builder(requireContext())
+                    builder.setTitle("Identification Result")
+                    builder.setMessage("We believe that your plant belongs to this species : ${response.bestMatch}\nAlthough our accuracy is beyond 97% we still recomend you to be cautious with the results")
+
+                    builder.setPositiveButton("OK") { dialog, which ->
+
+                    }
+
+                    val dialog: AlertDialog = builder.create()
+                    dialog.show()
+                            image = response.results.first().images.first().url.m
+                            Log.i("iden", image)
+                    val createIdentification = CreateIdentification(image, response.bestMatch.toString(), firebaseUser.uid)
+                    amaFloraViewModel.postIdentification(createIdentification)
+                            amaFloraViewModel.identificationResponse.value = null
+                        }
+                    })
+
+                    plantIdentificationViewModel.identificationError.observe(viewLifecycleOwner, Observer {
+                        if (it != null){
+                            binding.squaree?.visibility = View.VISIBLE
+                            binding.progressBar?.visibility = View.GONE
+                            binding.buttonPic.isClickable = true
+                            val builder = AlertDialog.Builder(requireContext())
+                            builder.setTitle("Identification error")
+                            builder.setMessage("${it.toString()}")
+
+                            builder.setPositiveButton("OK") { dialog, which ->
+
+                            }
+                            val dialog: AlertDialog = builder.create()
+                            dialog.show()
+                        }
+                    })
 
                 }
             }
         )
+
+
     }
 
     private fun displaySucces(uri: Uri?) {
@@ -208,7 +288,16 @@ class IdentifyFragment : Fragment() {
                     permissionGranted = false
                 }
                 if (!permissionGranted) {
-                    Toast.makeText(requireContext(), "Permission not granted", Toast.LENGTH_LONG).show()
+                    val builder = AlertDialog.Builder(requireContext())
+                    builder.setTitle("Permission")
+                    builder.setMessage("We need permission to access your camera to identify the plants.\nIf you don't grant access you won't be able to identify plants.")
+
+                    builder.setPositiveButton("OK") { dialog, which ->
+
+                    }
+                    val dialog: AlertDialog = builder.create()
+                    hasPermissions(requireContext())
+//                    findNavController().navigate(R.id.action_identifyFragment2_to_profileFragment)
                 } else {
                     startCamera()
                 }
@@ -228,12 +317,16 @@ class IdentifyFragment : Fragment() {
         private const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
         private val REQUIRED_PERMISSIONS =
             mutableListOf(
-                android.Manifest.permission.CAMERA
-            ).apply {
-                if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
-                    add(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                }
-            }.toTypedArray()
+                android.Manifest.permission.CAMERA,
+                android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+
+            )
+//                .apply {
+//                if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
+//                    add(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+//                }
+//            }
+            .toTypedArray()
 
         fun hasPermissions(context: Context) = Companion.REQUIRED_PERMISSIONS.all {
             ContextCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED

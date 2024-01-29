@@ -11,12 +11,15 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 
 private const val API_KEY = "2b1032IRdwIlPoPFQFbNMzMg2e"
+private const val DARE = true
 interface PlantIdentificationApiService {
     @Multipart
     @POST("/v2/identify/{project}")
     suspend fun identify(
         @Path("project") project: String= "all",
         @Part images: List<MultipartBody.Part>,
+        @Query("include-related-images") includeRelatedImages: Boolean = DARE,
         @Query("api-key") apiKey: String = API_KEY,
-    ): Response<IdentificationResponse>
+
+        ): Response<IdentificationResponse>
 }

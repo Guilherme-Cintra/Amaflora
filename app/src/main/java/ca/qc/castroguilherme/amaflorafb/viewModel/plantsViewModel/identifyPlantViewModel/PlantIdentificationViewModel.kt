@@ -13,9 +13,12 @@ import kotlinx.coroutines.launch
 import okhttp3.MultipartBody
 
 class PlantIdentificationViewModel(private val plantIdentificationRepository: PlantIdentificationRepository): ViewModel() {
-    val identificationResponse: MutableLiveData<IdentificationResponse> = MutableLiveData()
+    val identificationResponse: MutableLiveData<IdentificationResponse?> = MutableLiveData()
+    val identificationError: MutableLiveData<String?> = MutableLiveData()
 
     fun identify(project: String = "all",images: List<MultipartBody.Part>) = viewModelScope.launch {
+        identificationResponse.value = null
+        identificationError.value = null
         try {
             val response = plantIdentificationRepository.identify(project, images)
             if (response.isSuccessful) {
@@ -23,12 +26,14 @@ class PlantIdentificationViewModel(private val plantIdentificationRepository: Pl
                 Log.i("Planta", " line 19 : ${response.body()?.bestMatch}")
 //                Log.i("Planta", " line 19 : ${response.body()?.message}")
 
+
             }
             else {
 
                 val errorBody = response.errorBody()?.string()
                 Log.e("Planta", "Error: $errorBody")
 
+                identificationError.postValue("Plant could not be identified")
 
                 try {
                     val errorResponse = Gson().fromJson(errorBody, ErrorResponse::class.java)

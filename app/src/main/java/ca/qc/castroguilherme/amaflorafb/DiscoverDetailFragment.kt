@@ -1,5 +1,6 @@
 package ca.qc.castroguilherme.amaflorafb
 
+import android.app.TimePickerDialog
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -12,6 +13,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import ca.qc.castroguilherme.amaflorafb.databinding.FragmentDiscoverDetailBinding
 import ca.qc.castroguilherme.amaflorafb.models.amafloraDB.CreatePlant
+import ca.qc.castroguilherme.amaflorafb.models.amafloraDB.FavBody
 import ca.qc.castroguilherme.amaflorafb.models.amafloraDB.Recherche
 import ca.qc.castroguilherme.amaflorafb.models.amafloraDB.RechercheBody
 import ca.qc.castroguilherme.amaflorafb.viewModel.plantsViewModel.AmaFloraViewModel.AmaFloraRepository
@@ -21,12 +23,14 @@ import ca.qc.castroguilherme.amaflorafb.viewModel.plantsViewModel.discoverPlantV
 import ca.qc.castroguilherme.amaflorafb.viewModel.plantsViewModel.discoverPlantViewModel.PlantViewModelProviderFactory
 import ca.qc.castroguilherme.amaflorafb.viewModel.plantsViewModel.discoverPlantViewModel.PlantsViewModel
 import com.bumptech.glide.Glide
+import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.auth
 import java.text.SimpleDateFormat
 import java.time.LocalDate
+import java.util.Calendar
 import java.util.Date
 
 // TODO: Rename parameter arguments, choose names that match
@@ -86,11 +90,11 @@ class DiscoverDetailFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
 
-        val plant = args.plant
-        val id = plant.id
-        Log.i("MyApi", "id : ${id}")
 
-        plantsViewModel.getDetail(plant.id)
+        val id = args.id
+        Log.i("plantIn", "id in fragment : ${id}")
+
+        plantsViewModel.getDetail(args.id)
         plantsViewModel.detailPlant.observe(viewLifecycleOwner, Observer {
                 response ->
             binding.imageUrl.apply {
@@ -113,41 +117,69 @@ class DiscoverDetailFragment : Fragment() {
 
             response.description
 
-            val createPlant = CreatePlant(response.description, response.wateringGeneralBenchmark.value, plant.id, response.defaultImage.thumbnail, response.careLevel, response.commonName, response.scientificName[0], sun, response.wateringGeneralBenchmark.unit )
-            amaFloraViewModel.createPlant(createPlant)
-            amaFloraViewModel.platCreationResponse.observe(viewLifecycleOwner, Observer {
-                response ->
-                Log.i("MyApi", "${response.newPlant?.description}")
-            })
-
             auth = Firebase.auth
             firebaseUser = auth.currentUser!!
             val sdf = SimpleDateFormat("dd/M/yyyy hh:mm:ss")
             val currentDate = sdf.format(Date())
-            val recherche = RechercheBody(currentDate.toString(), id, firebaseUser.uid.toString())
+            val recherche = RechercheBody(currentDate.toString(), args.id, firebaseUser.uid.toString())
 
-            Log.i("MyApi", "date : ${recherche.date}")
-            Log.i("MyApi", "id : ${recherche.plantId}}")
-            Log.i("MyApi", "uid : ${recherche.userId}")
-
-            amaFloraViewModel.sauvegarderRecherche(recherche)
-
-            amaFloraViewModel.rechercheSauvegardeResponse.observe(viewLifecycleOwner, Observer {
+            val createPlant = CreatePlant(response.description, response.wateringGeneralBenchmark.value, args.id, response.defaultImage.thumbnail, response.careLevel, response.commonName, response.scientificName[0], sun, response.wateringGeneralBenchmark.unit )
+            amaFloraViewModel.createPlant(createPlant, recherche)
+            amaFloraViewModel.platCreationResponse.observe(viewLifecycleOwner, Observer {
                 response ->
-                if (response.recherche != null) {
-                    Log.i("MyApi", "recherche sauvegardée date : ${response.recherche.date}")
-                }
+                Log.i("MyApi", "plant creation ${response.newPlant?.description}")
             })
+
+//            auth = Firebase.auth
+//            firebaseUser = auth.currentUser!!
+//            val sdf = SimpleDateFormat("dd/M/yyyy hh:mm:ss")
+//            val currentDate = sdf.format(Date())
+//            val recherche = RechercheBody(currentDate.toString(), id, firebaseUser.uid.toString())
+//
+//            Log.i("MyApi", "date : ${recherche.date}")
+//            Log.i("MyApi", "id : ${recherche.plantId}}")
+//            Log.i("MyApi", "uid : ${recherche.userId}")
+//
+//            amaFloraViewModel.sauvegarderRecherche(recherche)
+//
+//            amaFloraViewModel.rechercheSauvegardeResponse.observe(viewLifecycleOwner, Observer {
+//                response ->
+//                if (response.recherche != null) {
+//                    Log.i("MyApi", "recherche sauvegardée date : ${response.recherche.date}")
+//                }
+//            })
 
         })
 
 
         binding.buttonAdd.setOnClickListener {
-            findNavController().navigate(R.id.action_discoverDetailFragment_to_addPlantFragment)
+            val bundle = Bundle().apply {putSerializable("id", args.id)
+            }
+            findNavController().navigate(R.id.action_discoverDetailFragment_to_addPlantFragment, bundle)
         }
+
+        addToFav()
+
         back()
 
     }
+
+    private fun addToFav() {
+        binding.btnSave.setOnClickListener {
+            Log.i("Fav", "${args.id}")
+
+            val favBody = FavBody(args.id, firebaseUser.uid!! )
+            amaFloraViewModel.addToFav(favBody)
+
+            amaFloraViewModel.favResponse.observe(viewLifecycleOwner, Observer {
+                if (it.message.toString() == "Favorit ajouté"){
+                    view?.let { it1 -> Snackbar.make(it1, "Added to favourites", Snackbar.LENGTH_LONG).show() }
+                }
+            })
+        }
+    }
+
+
 
     private fun back() {
         binding.btnBack.setOnClickListener {
@@ -167,9 +199,9 @@ class DiscoverDetailFragment : Fragment() {
 //    }
 
     private fun detail() {
-        val plant = args.plant
-        Log.i("DetailError", "plant id: ${plant.id}")
-        plantsViewModel.getDetail(plant.id)
+        val id = args.id
+        Log.i("DetailError", "plant id: ${id}")
+        plantsViewModel.getDetail(id)
         plantsViewModel.detailPlant.observe(viewLifecycleOwner, Observer {
             response ->
             binding.imageUrl.apply {

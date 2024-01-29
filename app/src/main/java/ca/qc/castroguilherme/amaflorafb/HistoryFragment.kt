@@ -6,7 +6,17 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import ca.qc.castroguilherme.amaflorafb.databinding.FragmentHistoryBinding
+import ca.qc.castroguilherme.amaflorafb.viewModel.plantsViewModel.AmaFloraViewModel.AmaFloraRepository
+import ca.qc.castroguilherme.amaflorafb.viewModel.plantsViewModel.AmaFloraViewModel.AmaFloraViewModel
+import ca.qc.castroguilherme.amaflorafb.viewModel.plantsViewModel.AmaFloraViewModel.AmaFloraViewModelProviderFactory
+import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.auth
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -24,6 +34,19 @@ class HistoryFragment : Fragment() {
     private var param2: String? = null
     private lateinit var binding: FragmentHistoryBinding
 
+
+    //Firebase
+    lateinit var auth: FirebaseAuth
+    lateinit var firebaseUser: FirebaseUser
+
+    val amaFloraRepository = AmaFloraRepository()
+    val amaFloraViewModel: AmaFloraViewModel by lazy {
+        ViewModelProvider(this, AmaFloraViewModelProviderFactory(amaFloraRepository)).get(
+            AmaFloraViewModel::class.java
+        )
+    }
+
+    val identificationsAdapter = IdentificationsAdapter()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
@@ -44,11 +67,51 @@ class HistoryFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val top_anim = AnimationUtils.loadAnimation(requireContext(), R.anim.top_animation )
-        val bottom_anim = AnimationUtils.loadAnimation(requireContext(), R.anim.bottom_animation )
+
 
         binding.cardIdentifications.startAnimation(top_anim)
         binding.imageCamera.startAnimation(top_anim)
-        binding.cardNothing.startAnimation(bottom_anim)
+//        binding.cardNothing.startAnimation(bottom_anim)
+
+        initiateUser()
+
+        displayIdentifications()
+
+
+
+
+
+        deleteIdentification()
+
+    }
+
+    private fun deleteIdentification() {
+        identificationsAdapter.onDeleteClickListener = {
+            amaFloraViewModel.deleteIdentification(it.id)
+            view?.let { it1 -> Snackbar.make(it1, "Identification deleted", Snackbar.LENGTH_SHORT).show() }
+            displayIdentifications()
+        }
+    }
+
+    private fun displayIdentifications() {
+        amaFloraViewModel.getIdentificationList(firebaseUser.uid)
+        amaFloraViewModel.listIdentifications.observe(viewLifecycleOwner, Observer {
+            response ->
+//            if (!response.identifications.isEmpty() == true) {
+                binding.recyclerViewIdentifications.adapter = identificationsAdapter
+                identificationsAdapter.setIdentifications(response.identifications.reversed())
+//            } else {
+//                val bottom_anim = AnimationUtils.loadAnimation(requireContext(), R.anim.bottom_animation )
+//                binding.cardNothing.startAnimation(bottom_anim)
+//            }
+        })
+    }
+
+    private fun initiateUser() {
+        auth = Firebase.auth
+        firebaseUser = auth.currentUser!!
+
+
     }
     companion object {
         /**

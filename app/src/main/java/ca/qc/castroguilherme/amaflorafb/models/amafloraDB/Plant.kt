@@ -2,6 +2,7 @@ package ca.qc.castroguilherme.amaflorafb.models.amafloraDB
 
 
 import com.google.gson.annotations.SerializedName
+import java.io.Serializable
 
 data class Plant(
     @SerializedName("description")
@@ -22,4 +23,4 @@ data class Plant(
     val soleil: String,
     @SerializedName("uniteFreqEau")
     val uniteFreqEau: String
-)
+):Serializable
